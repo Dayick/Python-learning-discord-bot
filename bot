@@ -1,0 +1,55 @@
+import discord
+import asyncio
+import os
+import requests
+import json
+import random
+from dotenv import load_dotenv
+TOKEN = os.getenv("TOKEN")
+client = discord.Client()
+client.run(TOKEN)
+
+
+def get_quote():
+  response = requests.get("https://zenquotes.io/api/random")
+  json_data = json.loads(response.text)
+  quote = json_data[0]["q"]
+  author = json_data[0]["a"]
+  return(quote + " - " + author)
+  
+sad_words = ["sad", "cry", "crying", "depression", "miserable", "depressed"]
+starter_encouragements = [
+  "Dont worry, be happy.",
+  "Hold on, be strong.",
+  "Dont cry, bitch.",
+  "Just go kill yourself."
+]
+
+@client.event
+async def on_ready():
+  print("We have logged in as {0.user}"
+  .format(client))
+
+
+@client.event
+async def on_message(message):
+  if message.author == client.user:
+    return
+
+  msg = message.content
+  
+  if message.content.lower().startswith("hello"):
+    await message.channel.send(f"Hello {message.author.display_name}!")
+
+  if message.content.lower().startswith("hi"):
+    await message.channel.send(f"Hello {message.author.display_name}!")
+  
+  if message.content.startswith("inspire"):
+    quote = get_quote()
+    await message.channel.send(quote)
+  
+  if message.content.lower().startswith("nespi"):
+    await message.channel.send("Drž hubu. xD")
+
+  if any(word in msg for word in sad_words):
+    await message.channel.send(random.choice(starter_encouragements))
